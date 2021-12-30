@@ -36,16 +36,16 @@ const state = {
     },
     speed: 4,
 };
-function initState(){
+function initState() {
     state.paddle1.top = state.board.height / 2 - state.paddle1.height / 2;
     state.paddle2.top = state.board.height / 2 - state.paddle2.height / 2;
     state.ball.top =
         state.paddle1.top + state.paddle1.height / 2 - state.ball.height / 2;
     state.ball.left = state.paddle1.left + state.paddle1.width + 10;
+    state.ball.direction = 1;
 }
 function init() {
-   
-    initState()
+    initState();
     document.addEventListener("keydown", (e) => {
         if (state.keyboard.hasOwnProperty(e.key)) {
             state.keyboard[e.key] = true;
@@ -73,8 +73,8 @@ function movePaddle(paddle, offset) {
 function update() {
     updatePaddles();
     updateBall();
-    if(checkIfLost()){
-        initState()
+    if (checkIfLost()) {
+        initState();
     }
 }
 function updatePaddles() {
@@ -134,10 +134,13 @@ function checkBallCollision() {
     } else if (paddle2Collision()) {
         state.ball.direction = -1;
     }
-    
 }
 function checkIfLost() {
-    return (state.ball.left < state.paddle1.left + state.paddle1.width / 2)||state.ball.left + state.ball.width> state.board.width - state.paddle2.right - state.paddle2.width /2
+    return (
+        state.ball.left < state.paddle1.left + state.paddle1.width / 2 ||
+        state.ball.left + state.ball.width >
+            state.board.width - state.paddle2.right - state.paddle2.width / 2
+    );
 }
 
 function main() {
