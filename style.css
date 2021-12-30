@@ -1,0 +1,32 @@
+body{
+    place-items: center;
+}
+.board{
+    outline: 1px solid black;
+    height: 480px;
+    width: 720px;
+    background-color: black;
+    position: relative;
+}
+.paddle1, .paddle2{
+    width: 15px;
+    height: 75px;
+    background-color: gray;
+    border: none;
+    position: absolute;
+   
+}
+.paddle2{
+    right: 5px;
+}
+.paddle1{
+    left: 5px;
+}
+.ball{
+    position: relative;
+    background-color: white;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    transition: ;
+}
