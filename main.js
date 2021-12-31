@@ -74,8 +74,8 @@ function initState() {
     clearTimeout(state.paddle2.timeoutId);
     state.paddle1.speed = state.defaultSpeed;
     state.paddle2.speed = state.defaultSpeed;
-    state.paddle1.turboRemaining = 1
-    state.paddle2.turboRemaining = 1
+    state.paddle1.turboRemaining = 1;
+    state.paddle2.turboRemaining = 1;
 }
 function init() {
     initState();
@@ -85,7 +85,7 @@ function init() {
         }
     });
     document.addEventListener("keyup", (e) => {
-        if (e.code === "ControlLeft" && state.paddle1.turboRemaining > 0) {
+        if (e.key === "e" && state.paddle1.turboRemaining > 0) {
             state.paddle1.speed *= 2;
             state.paddle1.timeoutId = setTimeout(
                 () => (state.paddle1.speed = state.defaultSpeed),
@@ -93,7 +93,7 @@ function init() {
             );
             state.paddle1.turboRemaining--;
         }
-        if (e.code === "ControlRight" && state.paddle2.turboRemaining > 0) {
+        if (e.key === "/" && state.paddle2.turboRemaining > 0) {
             state.paddle2.speed *= 2;
             setTimeout(() => (state.paddle2.speed = state.defaultSpeed), 3000);
             state.paddle2.turboRemaining--;
@@ -109,15 +109,15 @@ function render() {
     paddle2.style.top = state.paddle2.top + "px";
     ball.style.top = state.ball.top + "px";
     ball.style.left = state.ball.left + "px";
-    if(state.paddle1.speed>state.defaultSpeed){
-        paddle1.classList.add('turbo')
-    }else if(state.paddle1.speed === state.defaultSpeed){
-        paddle1.classList.remove('turbo')
+    if (state.paddle1.speed > state.defaultSpeed) {
+        paddle1.classList.add("turbo");
+    } else if (state.paddle1.speed === state.defaultSpeed) {
+        paddle1.classList.remove("turbo");
     }
-    if(state.paddle2.speed>state.defaultSpeed){
-        paddle2.classList.add('turbo')
-    }else if(state.paddle2.speed === state.defaultSpeed){
-        paddle2.classList.remove('turbo')
+    if (state.paddle2.speed > state.defaultSpeed) {
+        paddle2.classList.add("turbo");
+    } else if (state.paddle2.speed === state.defaultSpeed) {
+        paddle2.classList.remove("turbo");
     }
     renderScore();
 }
@@ -148,14 +148,14 @@ function updateScore() {
 function updatePaddles() {
     if (state.keyboard.w) {
         movePaddle("paddle1", -1);
-        if (state.ball.direction.x === 0) {
+        if (state.ball.direction.x === 0 && state.hasBall===1) {
             state.ball.direction.x = 1;
             state.ball.direction.y = -1;
         }
     }
     if (state.keyboard.s) {
         movePaddle("paddle1", 1);
-        if (state.ball.direction.x === 0) {
+        if (state.ball.direction.x === 0 && state.hasBall===1) {
             state.ball.direction.x = 1;
             state.ball.direction.y = 1;
         }
@@ -163,14 +163,14 @@ function updatePaddles() {
     // if(state.)
     if (state.keyboard.ArrowDown) {
         movePaddle("paddle2", 1);
-        if (state.ball.direction.x === 0) {
+        if (state.ball.direction.x === 0 && state.hasBall===2) {
             state.ball.direction.x = -1;
             state.ball.direction.y = 1;
         }
     }
     if (state.keyboard.ArrowUp) {
         movePaddle("paddle2", -1);
-        if (state.ball.direction.x === 0) {
+        if (state.ball.direction.x === 0 && state.hasBall===2) {
             state.ball.direction.x = -1;
             state.ball.direction.y = -1;
         }
