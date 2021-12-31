@@ -5,6 +5,7 @@ const board = document.querySelector(".board");
 const scoreH2 = document.querySelector(".score");
 const pongSound = document.querySelector("audio");
 
+
 const state = {
     board: {
         width: 720,
@@ -50,7 +51,9 @@ const state = {
     hasBall: 1,
     ballBounced: false,
     defaultSpeed: 4,
+    mainIntervalId: 0,
 };
+
 function initState() {
     state.paddle1.top = state.board.height / 2 - state.paddle1.height / 2;
     state.paddle2.top = state.board.height / 2 - state.paddle2.height / 2;
@@ -132,7 +135,15 @@ function update() {
     updateBall();
     if (checkIfLost()) {
         updateScore();
-        initState();
+        clearInterval(state.mainIntervalId);
+        const startOver = document.createElement("h2");
+        startOver.textContent = "Start Again";
+        startOver.addEventListener("click", (e) => {
+            main();
+            startOver.remove()
+        });
+        document.body.append(startOver);
+        // main()
     }
 }
 function updateScore() {
@@ -148,14 +159,14 @@ function updateScore() {
 function updatePaddles() {
     if (state.keyboard.w) {
         movePaddle("paddle1", -1);
-        if (state.ball.direction.x === 0 && state.hasBall===1) {
+        if (state.ball.direction.x === 0 && state.hasBall === 1) {
             state.ball.direction.x = 1;
             state.ball.direction.y = -1;
         }
     }
     if (state.keyboard.s) {
         movePaddle("paddle1", 1);
-        if (state.ball.direction.x === 0 && state.hasBall===1) {
+        if (state.ball.direction.x === 0 && state.hasBall === 1) {
             state.ball.direction.x = 1;
             state.ball.direction.y = 1;
         }
@@ -163,14 +174,14 @@ function updatePaddles() {
     // if(state.)
     if (state.keyboard.arrowdown) {
         movePaddle("paddle2", 1);
-        if (state.ball.direction.x === 0 && state.hasBall===2) {
+        if (state.ball.direction.x === 0 && state.hasBall === 2) {
             state.ball.direction.x = -1;
             state.ball.direction.y = 1;
         }
     }
     if (state.keyboard.arrowup) {
         movePaddle("paddle2", -1);
-        if (state.ball.direction.x === 0 && state.hasBall===2) {
+        if (state.ball.direction.x === 0 && state.hasBall === 2) {
             state.ball.direction.x = -1;
             state.ball.direction.y = -1;
         }
@@ -244,9 +255,9 @@ function checkBallCollision() {
     } else if (paddle2Collision()) {
         state.ballBounced = true;
         state.ball.direction.x = -1;
-        if (state.keyboard.ArrowUp) {
+        if (state.keyboard.arrowup) {
             state.ball.direction.y = -1;
-        } else if (state.keyboard.ArrowDown) {
+        } else if (state.keyboard.arrowdown) {
             state.ball.direction.y = 1;
         }
         state.ball.left =
@@ -273,7 +284,7 @@ function playSound() {
 
 function main() {
     init();
-    setInterval(() => {
+    state.mainIntervalId = setInterval(() => {
         update();
         render();
         playSound();
