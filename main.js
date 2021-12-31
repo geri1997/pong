@@ -27,8 +27,9 @@ const state = {
         top: 0,
         left: 5,
         score: 0,
-        speed:4,
-        timeoutId:0
+        speed: 4,
+        timeoutId: 0,
+        turboRemaining: 1,
     },
     paddle2: {
         width: 15,
@@ -36,8 +37,9 @@ const state = {
         top: 0,
         right: 5,
         score: 0,
-        speed:4,
-        timeoutId:0
+        speed: 4,
+        timeoutId: 0,
+        turboRemaining: 1,
     },
     keyboard: {
         w: false,
@@ -47,7 +49,7 @@ const state = {
     },
     hasBall: 1,
     ballBounced: false,
-    defaultSpeed:4
+    defaultSpeed: 4,
 };
 function initState() {
     state.paddle1.top = state.board.height / 2 - state.paddle1.height / 2;
@@ -56,7 +58,7 @@ function initState() {
         state.paddle1.top + state.paddle1.height / 2 - state.ball.height / 2;
     state.ball.direction.x = 0;
     state.ball.direction.y = 0;
-    
+
     if (state.hasBall === 1) {
         state.ball.left = state.paddle1.left + state.paddle1.width + 1;
     }
@@ -68,10 +70,12 @@ function initState() {
             state.ball.width -
             1;
     }
-    clearTimeout(state.paddle1.timeoutId)
-    clearTimeout(state.paddle2.timeoutId)
-    state.paddle1.speed = state.defaultSpeed
-    state.paddle2.speed = state.defaultSpeed
+    clearTimeout(state.paddle1.timeoutId);
+    clearTimeout(state.paddle2.timeoutId);
+    state.paddle1.speed = state.defaultSpeed;
+    state.paddle2.speed = state.defaultSpeed;
+    state.paddle1.turboRemaining = 1
+    state.paddle2.turboRemaining = 1
 }
 function init() {
     initState();
@@ -81,21 +85,23 @@ function init() {
         }
     });
     document.addEventListener("keyup", (e) => {
-        console.log(e.code)
-        if(e.code==='ControlLeft'){
-            state.paddle1.speed *=2
-            state.paddle1.timeoutId = setTimeout(()=>state.paddle1.speed = state.defaultSpeed,3000)
-
+        if (e.code === "ControlLeft" && state.paddle1.turboRemaining > 0) {
+            state.paddle1.speed *= 2;
+            state.paddle1.timeoutId = setTimeout(
+                () => (state.paddle1.speed = state.defaultSpeed),
+                3000
+            );
+            state.paddle1.turboRemaining--;
         }
-        if(e.code==='ControlRight'){
-            state.paddle2.speed *=2
-            setTimeout(()=>state.paddle2.speed = state.defaultSpeed,3000)
+        if (e.code === "ControlRight" && state.paddle2.turboRemaining > 0) {
+            state.paddle2.speed *= 2;
+            setTimeout(() => (state.paddle2.speed = state.defaultSpeed), 3000);
+            state.paddle2.turboRemaining--;
         }
         if (state.keyboard.hasOwnProperty(e.key)) {
             state.keyboard[e.key] = false;
         }
     });
-    // document.addEventListener('key',e=>movePaddle(paddle2))
 }
 
 function render() {
@@ -103,6 +109,16 @@ function render() {
     paddle2.style.top = state.paddle2.top + "px";
     ball.style.top = state.ball.top + "px";
     ball.style.left = state.ball.left + "px";
+    if(state.paddle1.speed>state.defaultSpeed){
+        paddle1.classList.add('turbo')
+    }else if(state.paddle1.speed === state.defaultSpeed){
+        paddle1.classList.remove('turbo')
+    }
+    if(state.paddle2.speed>state.defaultSpeed){
+        paddle2.classList.add('turbo')
+    }else if(state.paddle2.speed === state.defaultSpeed){
+        paddle2.classList.remove('turbo')
+    }
     renderScore();
 }
 
@@ -117,7 +133,6 @@ function update() {
     if (checkIfLost()) {
         updateScore();
         initState();
-
     }
 }
 function updateScore() {

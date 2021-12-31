@@ -35,3 +35,6 @@ body{
 .score{
     text-align: center;
 }
+.turbo{
+    background-color: red;
+}
