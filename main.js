@@ -3,6 +3,7 @@ const paddle2 = document.querySelector(".paddle2");
 const ball = document.querySelector(".ball");
 const board = document.querySelector(".board");
 const scoreH2 = document.querySelector(".score");
+const pongSound = document.querySelector("audio");
 
 const state = {
     board: {
@@ -26,6 +27,8 @@ const state = {
         top: 0,
         left: 5,
         score: 0,
+        speed:4,
+        timeoutId:0
     },
     paddle2: {
         width: 15,
@@ -33,6 +36,8 @@ const state = {
         top: 0,
         right: 5,
         score: 0,
+        speed:4,
+        timeoutId:0
     },
     keyboard: {
         w: false,
@@ -40,16 +45,33 @@ const state = {
         ArrowUp: false,
         ArrowDown: false,
     },
-    speed: 4,
+    hasBall: 1,
+    ballBounced: false,
+    defaultSpeed:4
 };
 function initState() {
     state.paddle1.top = state.board.height / 2 - state.paddle1.height / 2;
     state.paddle2.top = state.board.height / 2 - state.paddle2.height / 2;
     state.ball.top =
         state.paddle1.top + state.paddle1.height / 2 - state.ball.height / 2;
-    state.ball.left = state.paddle1.left + state.paddle1.width + 1;
     state.ball.direction.x = 0;
     state.ball.direction.y = 0;
+    
+    if (state.hasBall === 1) {
+        state.ball.left = state.paddle1.left + state.paddle1.width + 1;
+    }
+    if (state.hasBall === 2) {
+        state.ball.left =
+            state.board.width -
+            state.paddle2.right -
+            state.paddle2.width -
+            state.ball.width -
+            1;
+    }
+    clearTimeout(state.paddle1.timeoutId)
+    clearTimeout(state.paddle2.timeoutId)
+    state.paddle1.speed = state.defaultSpeed
+    state.paddle2.speed = state.defaultSpeed
 }
 function init() {
     initState();
@@ -59,6 +81,16 @@ function init() {
         }
     });
     document.addEventListener("keyup", (e) => {
+        console.log(e.code)
+        if(e.code==='ControlLeft'){
+            state.paddle1.speed *=2
+            state.paddle1.timeoutId = setTimeout(()=>state.paddle1.speed = state.defaultSpeed,3000)
+
+        }
+        if(e.code==='ControlRight'){
+            state.paddle2.speed *=2
+            setTimeout(()=>state.paddle2.speed = state.defaultSpeed,3000)
+        }
         if (state.keyboard.hasOwnProperty(e.key)) {
             state.keyboard[e.key] = false;
         }
@@ -75,23 +107,27 @@ function render() {
 }
 
 function movePaddle(paddle, offset) {
-    state[paddle].top += offset * state.speed;
+    state[paddle].top += offset * state[paddle].speed;
 }
 
 function update() {
+    state.ballBounced = false;
     updatePaddles();
     updateBall();
     if (checkIfLost()) {
-        updateScore()
+        updateScore();
         initState();
+
     }
 }
-function updateScore(){
-    if(state.ball.left < state.board.width/2){
-        state.paddle2.score +=1
+function updateScore() {
+    if (state.ball.left < state.board.width / 2) {
+        state.paddle2.score += 1;
+        state.hasBall = 1;
     }
-    if(state.ball.left > state.board.width/2){
-        state.paddle1.score +=1
+    if (state.ball.left > state.board.width / 2) {
+        state.paddle1.score += 1;
+        state.hasBall = 2;
     }
 }
 function updatePaddles() {
@@ -109,11 +145,20 @@ function updatePaddles() {
             state.ball.direction.y = 1;
         }
     }
+    // if(state.)
     if (state.keyboard.ArrowDown) {
         movePaddle("paddle2", 1);
+        if (state.ball.direction.x === 0) {
+            state.ball.direction.x = -1;
+            state.ball.direction.y = 1;
+        }
     }
     if (state.keyboard.ArrowUp) {
         movePaddle("paddle2", -1);
+        if (state.ball.direction.x === 0) {
+            state.ball.direction.x = -1;
+            state.ball.direction.y = -1;
+        }
     }
     checkPaddleBorderCollision();
 }
@@ -172,7 +217,9 @@ function renderScore() {
 }
 function checkBallCollision() {
     if (paddle1Collision()) {
+        state.ballBounced = true;
         state.ball.direction.x = 1;
+
         if (state.keyboard.w) {
             state.ball.direction.y = -1;
         } else if (state.keyboard.s) {
@@ -180,6 +227,7 @@ function checkBallCollision() {
         }
         state.ball.left = state.paddle1.left + state.paddle1.width;
     } else if (paddle2Collision()) {
+        state.ballBounced = true;
         state.ball.direction.x = -1;
         if (state.keyboard.ArrowUp) {
             state.ball.direction.y = -1;
@@ -202,11 +250,18 @@ function checkIfLost() {
     );
 }
 
+function playSound() {
+    if (state.ballBounced) {
+        pongSound.play();
+    }
+}
+
 function main() {
     init();
     setInterval(() => {
         update();
         render();
+        playSound();
     }, 1000 / 30);
 }
 
