@@ -44,8 +44,8 @@ const state = {
     keyboard: {
         w: false,
         s: false,
-        ArrowUp: false,
-        ArrowDown: false,
+        arrowup: false,
+        arrowdown: false,
     },
     hasBall: 1,
     ballBounced: false,
@@ -80,12 +80,12 @@ function initState() {
 function init() {
     initState();
     document.addEventListener("keydown", (e) => {
-        if (state.keyboard.hasOwnProperty(e.key)) {
-            state.keyboard[e.key] = true;
+        if (state.keyboard.hasOwnProperty(e.key.toLowerCase())) {
+            state.keyboard[e.key.toLowerCase()] = true;
         }
     });
     document.addEventListener("keyup", (e) => {
-        if (e.key === "e" && state.paddle1.turboRemaining > 0) {
+        if (e.key.toLowerCase() === "e" && state.paddle1.turboRemaining > 0) {
             state.paddle1.speed *= 2;
             state.paddle1.timeoutId = setTimeout(
                 () => (state.paddle1.speed = state.defaultSpeed),
@@ -98,8 +98,8 @@ function init() {
             setTimeout(() => (state.paddle2.speed = state.defaultSpeed), 3000);
             state.paddle2.turboRemaining--;
         }
-        if (state.keyboard.hasOwnProperty(e.key)) {
-            state.keyboard[e.key] = false;
+        if (state.keyboard.hasOwnProperty(e.key.toLowerCase())) {
+            state.keyboard[e.key.toLowerCase()] = false;
         }
     });
 }
@@ -161,14 +161,14 @@ function updatePaddles() {
         }
     }
     // if(state.)
-    if (state.keyboard.ArrowDown) {
+    if (state.keyboard.arrowdown) {
         movePaddle("paddle2", 1);
         if (state.ball.direction.x === 0 && state.hasBall===2) {
             state.ball.direction.x = -1;
             state.ball.direction.y = 1;
         }
     }
-    if (state.keyboard.ArrowUp) {
+    if (state.keyboard.arrowup) {
         movePaddle("paddle2", -1);
         if (state.ball.direction.x === 0 && state.hasBall===2) {
             state.ball.direction.x = -1;
