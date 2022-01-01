@@ -5,7 +5,6 @@ const board = document.querySelector(".board");
 const scoreH2 = document.querySelector(".score");
 const pongSound = document.querySelector("audio");
 
-
 const state = {
     board: {
         width: 720,
@@ -21,6 +20,7 @@ const state = {
             y: 0,
         },
         speed: 6,
+        speedIntervalId: null,
     },
     paddle1: {
         width: 15,
@@ -31,6 +31,7 @@ const state = {
         speed: 4,
         timeoutId: 0,
         turboRemaining: 1,
+        turboSpeed: 0,
     },
     paddle2: {
         width: 15,
@@ -41,6 +42,7 @@ const state = {
         speed: 4,
         timeoutId: 0,
         turboRemaining: 1,
+        turboSpeed: 0,
     },
     keyboard: {
         w: false,
@@ -79,9 +81,16 @@ function initState() {
     state.paddle2.speed = state.defaultSpeed;
     state.paddle1.turboRemaining = 1;
     state.paddle2.turboRemaining = 1;
+    state.ball.speed = 6;
 }
 function init() {
     initState();
+    clearInterval(state.ball.speedIntervalId);
+    state.ball.speedIntervalId = setInterval(() => {
+        state.ball.speed += 0.5;
+        state.paddle1.speed += 0.5;
+        state.paddle2.speed += 0.5;
+    }, 5000);
     document.addEventListener("keydown", (e) => {
         if (state.keyboard.hasOwnProperty(e.key.toLowerCase())) {
             state.keyboard[e.key.toLowerCase()] = true;
@@ -89,16 +98,17 @@ function init() {
     });
     document.addEventListener("keyup", (e) => {
         if (e.key.toLowerCase() === "e" && state.paddle1.turboRemaining > 0) {
-            state.paddle1.speed *= 2;
+            state.paddle1.turboSpeed = state.paddle1.speed * 2;
+            // state.paddle1.speed *= 2;
             state.paddle1.timeoutId = setTimeout(
-                () => (state.paddle1.speed = state.defaultSpeed),
+                () => (state.paddle1.turboSpeed = 0),
                 3000
             );
             state.paddle1.turboRemaining--;
         }
         if (e.key === "/" && state.paddle2.turboRemaining > 0) {
-            state.paddle2.speed *= 2;
-            setTimeout(() => (state.paddle2.speed = state.defaultSpeed), 3000);
+            state.paddle2.turboSpeed = state.paddle2.speed * 2;
+            setTimeout(() => (state.paddle2.turboSpeed = 0), 3000);
             state.paddle2.turboRemaining--;
         }
         if (state.keyboard.hasOwnProperty(e.key.toLowerCase())) {
@@ -112,21 +122,26 @@ function render() {
     paddle2.style.top = state.paddle2.top + "px";
     ball.style.top = state.ball.top + "px";
     ball.style.left = state.ball.left + "px";
-    if (state.paddle1.speed > state.defaultSpeed) {
+    if (state.paddle1.turboSpeed !== 0) {
         paddle1.classList.add("turbo");
-    } else if (state.paddle1.speed === state.defaultSpeed) {
+    } else if (state.paddle1.turboSpeed === 0) {
         paddle1.classList.remove("turbo");
     }
-    if (state.paddle2.speed > state.defaultSpeed) {
+
+    if (state.paddle2.turboSpeed !== 0) {
         paddle2.classList.add("turbo");
-    } else if (state.paddle2.speed === state.defaultSpeed) {
+    } else if (state.paddle2.turboSpeed === 0) {
         paddle2.classList.remove("turbo");
     }
     renderScore();
 }
 
 function movePaddle(paddle, offset) {
-    state[paddle].top += offset * state[paddle].speed;
+    if (state[paddle].turboSpeed !== 0) {
+        state[paddle].top += offset * state[paddle].turboSpeed;
+    } else {
+        state[paddle].top += offset * state[paddle].speed;
+    }
 }
 
 function update() {
@@ -140,7 +155,7 @@ function update() {
         startOver.textContent = "Start Again";
         startOver.addEventListener("click", (e) => {
             main();
-            startOver.remove()
+            startOver.remove();
         });
         document.body.append(startOver);
         // main()
